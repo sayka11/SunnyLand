@@ -1,0 +1,41 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CameraFollow : MonoBehaviour
+{
+    public Transform player;
+
+    private Vector3 point;
+    public float smoothtime = 0.3f;  // Значение по умолчанию
+    public Transform leftborder;
+    public Transform rightborder;
+    public Transform upperborder;
+    public Transform bottomborder;
+
+    private void Start()
+    {
+        // Инициализация точки
+        point = new Vector3(transform.position.x, transform.position.y, -20);
+    }
+
+    private void Following()
+    {
+        // Следим за положением игрока
+        point.x = player.position.x;
+        Vector3 point_position = Vector3.Lerp(transform.position, point, smoothtime * Time.fixedDeltaTime);
+        transform.position = point_position;
+    }
+
+    private void FixedUpdate()
+    {
+        Following();
+
+        // Ограничиваем движение камеры по границам
+        transform.position = new Vector3(
+            Mathf.Clamp(transform.position.x, leftborder.position.x, rightborder.position.x),
+            Mathf.Clamp(transform.position.y, bottomborder.position.y, upperborder.position.y),
+            -20  // Фиксированное значение для Z
+        );
+    }
+}
