@@ -1,4 +1,4 @@
- using System.Collections;
+  using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,7 +15,7 @@ public class Move: MonoBehaviour
     bool jump = false;
     bool crouch = false;
 
-    /*public Transform Respawn;*/
+    public Transform Respawn;
 
 
     void Update()
@@ -43,7 +43,7 @@ public class Move: MonoBehaviour
     }
 
 
-    /*private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Respawn")
         {
@@ -55,7 +55,7 @@ public class Move: MonoBehaviour
             transform.position = Respawn.position;
         }
 
-    }*/
+    }
 
 
 
