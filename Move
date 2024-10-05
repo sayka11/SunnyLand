@@ -7,8 +7,8 @@ public class Move: MonoBehaviour
 {
 
     public CharacterController2D controller;
-    /*public Animator animator;*/
-
+    public Animator animator;
+    public Rigidbody2D rb;
     public float runSpeed = 40f;
 
     float horizontalMove = 0f;
@@ -22,13 +22,13 @@ public class Move: MonoBehaviour
     {
 
         horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;
-
-       // animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
+        animator.SetBool("isGround", controller.m_Grounded);
+       animator.SetFloat("velocityY",rb.velocity.y);
 
         if (Input.GetButtonDown("Jump"))
         {
             jump = true;
-            //animator.SetBool("IsJumping", true);
+            animator.SetTrigger("Jump");
         }
 
         if (Input.GetButtonDown("Crouch"))
@@ -54,9 +54,9 @@ public class Move: MonoBehaviour
         {
             transform.position = Respawn.position;
         }
-        if(other.gameObject.CompareTag("Spikes")){
+        /*if(other.gameObject.CompareTag("Spikes")){
             transform.position=Respawn.position;
-        }
+        } */
 
     }
 
