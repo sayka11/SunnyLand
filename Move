@@ -43,16 +43,19 @@ public class Move: MonoBehaviour
     }
 
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.gameObject.tag == "Respawn")
+        if (other.gameObject.CompareTag("Finish"))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
+        if (other.gameObject.tag == "Respawn")
         {
             transform.position = Respawn.position;
         }
-
-        if (collision.gameObject.tag == "Spikes")
-        {
-            transform.position = Respawn.position;
+        if(other.gameObject.CompareTag("Spikes")){
+            transform.position=Respawn.position;
         }
 
     }
