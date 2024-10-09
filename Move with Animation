@@ -3,37 +3,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Move: MonoBehaviour
+public class Move : MonoBehaviour
 {
-
     public CharacterController2D controller;
     public Animator animator;
     public Rigidbody2D rb;
-
     public float runSpeed = 40f;
 
     float horizontalMove = 0f;
     bool jump = false;
     bool crouch = false;
 
-    /*public Transform Respawn;*/
-
+    public Transform Respawn;
 
     void Update()
     {
-
         horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;
 
+        // Устанавливаем анимацию бега, если персонаж движется
         animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
-        animator.SetFloat("velocityY",rb.velocity.y);
-        animator.SetBool("isGround",controller.m_Grounded);
 
-        if (Input.GetButtonDown("Jump"))
+        // Обновляем анимацию для состояния на земле
+        animator.SetBool("isGround", controller.m_Grounded);
+        animator.SetFloat("velocityY", rb.velocity.y);
+
+        // Проверяем нажатие прыжка
+        if (Input.GetButtonDown("Jump") && controller.m_Grounded)  // Проверяем, что персонаж на земле
         {
             jump = true;
-            animator.SetTrigger("Jump");
+            animator.SetTrigger("Jump");  // Срабатывает триггер для начала анимации прыжка
         }
 
+        // Проверяем нажатие приседания
         if (Input.GetButtonDown("Crouch"))
         {
             crouch = true;
@@ -42,39 +43,32 @@ public class Move: MonoBehaviour
         {
             crouch = false;
         }
-
     }
 
-
-    /*private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.gameObject.tag == "Respawn")
+        if (other.gameObject.CompareTag("Finish"))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
+        if (other.gameObject.CompareTag("Respawn"))
         {
             transform.position = Respawn.position;
         }
-
-        if (collision.gameObject.tag == "Spikes")
-        {
-            transform.position = Respawn.position;
-        }
-
-    }*/
-
-
-
-   /*public void OnLanding()
-    {
-        animator.SetBool("IsJumping", false);
     }
-
-    public void OnCrouching(bool isCrouching)
-    {
-        animator.SetBool("IsCrouching", isCrouching);
-    }*/
 
     void FixedUpdate()
     {
+        // Движение персонажа
         controller.Move(horizontalMove * Time.fixedDeltaTime, crouch, jump);
         jump = false;
+
+        // Проверка приземления
+        if (controller.m_Grounded)
+        {
+            // Сбрасываем триггер прыжка при приземлении
+            animator.ResetTrigger("Jump");
+        }
     }
 }
