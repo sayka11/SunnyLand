@@ -1,0 +1,25 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class Counter : MonoBehaviour
+{
+    public int Count=0;
+    public GameObject ScoreCounter;
+
+    private void Start(){
+        Count=PlayerPrefs.GetInt("Score");
+        ScoreCounter.GetComponent<Text>().text="Score"+ Count.ToString();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision){
+        if(collision.gameObject.tag =="Cherry"){
+             Count=+50;
+        ScoreCounter.GetComponent<Text>().text= "Score"+ Count.ToString();
+        Destroy(collision.gameObject);
+        PlayerPrefs.SetInt("Score",Count);
+        }
+        }
+       
+    }
