@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement; // Для управления сценами
 
 public class Counter : MonoBehaviour
 {
@@ -18,20 +17,14 @@ public class Counter : MonoBehaviour
             return;
         }
 
-        // Если это первая сцена или новая игра — сбрасываем счет
-        if (SceneManager.GetActiveScene().buildIndex == 0 && PlayerPrefs.GetInt("NewGame", 1) == 1)
-        {
-            Count = 0;
-            PlayerPrefs.SetInt("Score", 0);
-            PlayerPrefs.SetInt("NewGame", 0);
-        }
-        else
-        {
-            // Загружаем счет при переходе на новую сцену
-            Count = PlayerPrefs.GetInt("Score", 0);
-        }
+        // Сбрасываем счет при запуске новой игры (всегда обнуляем счет при запуске)
+        Count = 0;
+        PlayerPrefs.SetInt("Score", 0);
 
-        // Обновляем отображение счета
+        // Ставим флаг, что это новая игра (если нужно для других сценариев)
+        PlayerPrefs.SetInt("NewGame", 0);
+
+        // Обновляем отображение счета сразу при запуске
         UpdateScoreDisplay();
     }
 
@@ -51,13 +44,6 @@ public class Counter : MonoBehaviour
 
             // Сохраняем счет в PlayerPrefs
             PlayerPrefs.SetInt("Score", Count);
-        }
-        // Если объект с тегом "NextLevel" — переходим на новую сцену
-        if (collision.gameObject.tag == "NextLevel")
-        {
-            // Сохраняем счет перед переходом на новый уровень
-            PlayerPrefs.SetInt("Score", Count);
-            SceneManager.LoadScene("Level2");
         }
     }
 
