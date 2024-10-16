@@ -2,24 +2,84 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; // Для управления сценами
 
 public class Counter : MonoBehaviour
 {
-    public int Count=0;
-    public GameObject ScoreCounter;
+    public int Count = 0;
+    public GameObject ScoreCounter; // UI элемент для отображения счета
 
-    private void Start(){
-        Count=PlayerPrefs.GetInt("Score");
-        ScoreCounter.GetComponent<Text>().text="Score"+ Count.ToString();
+    private void Start()
+    {
+        // Проверяем наличие ScoreCounter и выводим ошибку, если его нет
+        if (ScoreCounter == null)
+        {
+            Debug.LogError("ScoreCounter (Counter) не назначен в инспекторе!");
+            return;
+        }
+
+        // Если это первая сцена или новая игра — сбрасываем счет
+        if (SceneManager.GetActiveScene().buildIndex == 0 && PlayerPrefs.GetInt("NewGame", 1) == 1)
+        {
+            Count = 0;
+            PlayerPrefs.SetInt("Score", 0);
+            PlayerPrefs.SetInt("NewGame", 0);
+        }
+        else
+        {
+            // Загружаем счет при переходе на новую сцену
+            Count = PlayerPrefs.GetInt("Score", 0);
+        }
+
+        // Обновляем отображение счета
+        UpdateScoreDisplay();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision){
-        if(collision.gameObject.tag =="Cherry"){
-             Count=+50;
-        ScoreCounter.GetComponent<Text>().text= "Score"+ Count.ToString();
-        Destroy(collision.gameObject);
-        PlayerPrefs.SetInt("Score",Count);
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        // Проверяем, что объект имеет тег "Cherry"
+        if (collision.gameObject.tag == "Cherry")
+        {
+            // Увеличиваем счет на 50 за каждую собранную вишню
+            Count += 50;
+
+            // Обновляем отображение счета
+            UpdateScoreDisplay();
+
+            // Удаляем объект вишни
+            Destroy(collision.gameObject);
+
+            // Сохраняем счет в PlayerPrefs
+            PlayerPrefs.SetInt("Score", Count);
         }
+        // Если объект с тегом "NextLevel" — переходим на новую сцену
+        if (collision.gameObject.tag == "NextLevel")
+        {
+            // Сохраняем счет перед переходом на новый уровень
+            PlayerPrefs.SetInt("Score", Count);
+            SceneManager.LoadScene("Level2");
         }
-       
     }
+
+    // Метод для обновления отображения счета
+    private void UpdateScoreDisplay()
+    {
+        if (ScoreCounter != null)
+        {
+            // Обновляем текст UI элемента с именем "Counter"
+            Text scoreText = ScoreCounter.GetComponent<Text>();
+            if (scoreText != null)
+            {
+                scoreText.text = "Score: " + Count.ToString();
+            }
+            else
+            {
+                Debug.LogError("ScoreCounter (Counter) не содержит компонент Text!");
+            }
+        }
+        else
+        {
+            Debug.LogError("ScoreCounter (Counter) не назначен!");
+        }
+    }
+}
