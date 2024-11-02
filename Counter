@@ -2,70 +2,52 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Counter : MonoBehaviour
 {
     public int Count = 0;
-    public GameObject ScoreCounter; // UI элемент для отображения счета
+    private GameObject ScoreCounter; // Удаляем привязку через инспектор
 
     private void Start()
     {
-        // Проверяем наличие ScoreCounter и выводим ошибку, если его нет
+        // Находим ScoreCounter на Canvas, если он есть
+        ScoreCounter = GameObject.Find("ScoreCounter"); // Убедитесь, что имя совпадает с объектом
+
         if (ScoreCounter == null)
         {
-            Debug.LogError("ScoreCounter (Counter) не назначен в инспекторе!");
+            Debug.LogWarning("ScoreCounter не найден. Убедитесь, что он есть на Canvas.");
             return;
         }
 
-        // Сбрасываем счет при запуске новой игры (всегда обнуляем счет при запуске)
-        Count = 0;
-        PlayerPrefs.SetInt("Score", 0);
+        // Проверка на уровень Level1 для сброса счета
+        if (SceneManager.GetActiveScene().name == "Level1")
+        {
+            PlayerPrefs.DeleteKey("Score");
+            Count = 0;
+        }
+        else
+        {
+            Count = PlayerPrefs.GetInt("Score", 0);
+        }
 
-        // Ставим флаг, что это новая игра (если нужно для других сценариев)
-        PlayerPrefs.SetInt("NewGame", 0);
+        // Устанавливаем ScoreCounter в качестве объекта, который не будет уничтожен при загрузке нового уровня
+        DontDestroyOnLoad(ScoreCounter.transform.parent.gameObject);
 
-        // Обновляем отображение счета сразу при запуске
-        UpdateScoreDisplay();
+        // Обновляем текст счетчика
+        ScoreCounter.GetComponent<Text>().text = "Score: " + Count.ToString();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Проверяем, что объект имеет тег "Cherry"
         if (collision.gameObject.tag == "Cherry")
         {
-            // Увеличиваем счет на 50 за каждую собранную вишню
             Count += 50;
-
-            // Обновляем отображение счета
-            UpdateScoreDisplay();
-
-            // Удаляем объект вишни
+            ScoreCounter.GetComponent<Text>().text = "Score: " + Count.ToString();
             Destroy(collision.gameObject);
 
-            // Сохраняем счет в PlayerPrefs
+            // Сохраняем счет после каждого собранного объекта
             PlayerPrefs.SetInt("Score", Count);
-        }
-    }
-
-    // Метод для обновления отображения счета
-    private void UpdateScoreDisplay()
-    {
-        if (ScoreCounter != null)
-        {
-            // Обновляем текст UI элемента с именем "Counter"
-            Text scoreText = ScoreCounter.GetComponent<Text>();
-            if (scoreText != null)
-            {
-                scoreText.text = "Score: " + Count.ToString();
-            }
-            else
-            {
-                Debug.LogError("ScoreCounter (Counter) не содержит компонент Text!");
-            }
-        }
-        else
-        {
-            Debug.LogError("ScoreCounter (Counter) не назначен!");
         }
     }
 }
