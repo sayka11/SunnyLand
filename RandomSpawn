@@ -1,0 +1,40 @@
+using Unity.VisualScripting;
+using UnityEngine;
+
+public class RandomSpawn : MonoBehaviour
+{
+    public GameObject asteroid;
+    public GameObject asteroid_mini;
+    public Transform[] RandomPoint= new Transform[2];
+    private float spawnRate= 1f;
+    private float nextSpawn=0f;
+    private float _Random;
+    private Vector3 PointSpawn;
+    private int RandomAsteroid=0 ;
+    private float[] RandomY=new float[2];
+    void Start()
+    {
+        RandomY[1]=RandomPoint[1].position.y;
+        RandomY[2]=RandomPoint[2].position.y;
+    }
+    void Update()
+    {
+        if(Time.time>nextSpawn)
+        {
+             nextSpawn=Time.time +spawnRate;
+            _Random=Random.Range(RandomY[1],RandomY[2]);
+           PointSpawn=new Vector3(RandomPoint[1].position.x,_Random, RandomPoint[1].position.z);
+           RandomAsteroid=Random.Range(0,2);
+           switch (RandomAsteroid){
+            case 0:
+             Instantiate(asteroid,PointSpawn,Quaternion.identity); 
+
+              break;
+            case 1:
+               break;
+
+           }
+           Instantiate(asteroid_mini,PointSpawn,Quaternion.identity); 
+        }
+    }
+}
